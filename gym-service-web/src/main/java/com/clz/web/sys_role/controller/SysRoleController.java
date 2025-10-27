@@ -1,0 +1,70 @@
+package com.clz.web.sys_role.controller;
+
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.clz.utils.ResultUtils;
+import com.clz.utils.ResultVo;
+import com.clz.web.sys_role.entity.RoleParam;
+import com.clz.web.sys_role.entity.SysRole;
+import com.clz.web.sys_role.service.SysRoleService;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.Date;
+import java.util.List;
+
+@Api("角色控制器")
+@RestController
+@RequestMapping("/api/role")
+public class SysRoleController {
+
+    @Autowired
+    private SysRoleService service;
+
+    @PostMapping
+    @ApiOperation(value="新增角色")
+    public ResultVo save(@RequestBody SysRole sysRole) {
+        sysRole.setCreateTime(new Date());
+        boolean save = service.save(sysRole);
+        if(save){
+            return ResultUtils.success("新增成功!");
+        }else{
+            return ResultUtils.error("新增失败!");
+        }
+    }
+
+    @DeleteMapping("/{roleId}")
+    @ApiOperation(value="删除角色")
+    public ResultVo delete(@PathVariable("roleId") Integer roleId) {
+        boolean b = service.removeById(roleId);
+        if(b){
+            return ResultUtils.success("删除成功!");
+        }else{
+            return ResultUtils.error("删除失败!");
+        }
+    }
+
+    @PutMapping
+    @ApiOperation("修改角色")
+    public ResultVo update(@RequestBody SysRole sysRole) {
+        sysRole.setUpdateTime(new Date());
+        boolean b = service.updateById(sysRole);
+        if(b){
+            return ResultUtils.success("修改成功!");
+        }else{
+            return ResultUtils.error("修改失败!");
+        }
+    }
+
+    @GetMapping("/list")
+    @ApiOperation("查询角色")
+    public ResultVo list(RoleParam param) {
+        IPage<SysRole> list = service.list(param);
+        return ResultUtils.success("查询成功",list);
+    }
+
+
+
+
+}

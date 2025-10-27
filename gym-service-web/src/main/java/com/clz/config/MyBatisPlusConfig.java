@@ -8,7 +8,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 @Configuration
-@MapperScan("com.clz.mapper") // 自动扫描mapper,注册为bean
+@MapperScan("com.clz.*.*.mapper") // 自动扫描mapper,注册为bean
 public class MyBatisPlusConfig {
     @Bean
     public MybatisPlusInterceptor mybatisPlusInterceptor() {
