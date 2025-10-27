@@ -1,0 +1,20 @@
+server:
+  port: 8089
+spring:
+  datasource:
+    type: com.alibaba.druid.pool.DruidDataSource
+    driver-class-name: com.mysql.jdbc.Driver
+    url: jdbc:mysql://192.168.65.140:3306/gym
+    username: root
+    password: Admin123!
+mybatis-plus:
+  configuration:
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+  global-config:
+      db-config:
+        #配置mybatis plus 在更新时只更新非空和非NULL的字段
+        update-strategy: not_empty
+# 定义日志文件的输出格式
+logging:
+  pattern:
+    console: '%d{yyyy-MM-dd} [%thread] %-5level %logger- %msg%n'
