@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.clz.utils.ResultUtils;
 import com.clz.utils.ResultVo;
 import com.clz.web.sys_role.entity.RoleParam;
+import com.clz.web.sys_role.entity.SelectType;
 import com.clz.web.sys_role.entity.SysRole;
 import com.clz.web.sys_role.service.SysRoleService;
 import io.swagger.annotations.Api;
@@ -11,6 +12,7 @@ import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -64,7 +66,17 @@ public class SysRoleController {
         return ResultUtils.success("查询成功",list);
     }
 
-
+    @GetMapping("/getSelect")
+    @ApiOperation("查询下拉框可选项")
+    public ResultVo getSelect() {
+        List<SysRole> list = service.list();
+        List<SelectType> selectTypes = new ArrayList<>();
+        list.forEach(item ->{
+            selectTypes.add(
+                    new SelectType(item.getRoleId(), item.getRoleName()));
+        });
+        return ResultUtils.success("查询成功",selectTypes);
+    }
 
 
 }

@@ -22,8 +22,9 @@ public class SysRoleServiceImpl extends ServiceImpl<SysRoleMapper, SysRole> impl
         Page<SysRole> page = new Page<>();
         page.setCurrent(param.getCurrentPage());
         page.setSize(param.getPageSize());
-        QueryWrapper<SysRole> wrapper = new QueryWrapper<>();
-        wrapper.like(param.getRoleName() != null, "role_name", param.getRoleName());
-        return mapper.selectPage(page, wrapper);
+        QueryWrapper<SysRole> query = new QueryWrapper<>();
+//        query.lambda().like(SysRole::getRoleName, param.getRoleName());
+        query.like(param.getRoleName() != null, "role_name", param.getRoleName());
+        return mapper.selectPage(page, query);
     }
 }
