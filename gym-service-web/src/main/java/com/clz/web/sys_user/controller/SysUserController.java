@@ -18,6 +18,7 @@ import javax.annotation.Resource;
 import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.Objects;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/user")
@@ -50,9 +51,9 @@ public class SysUserController {
         }
     }
 
-    @DeleteMapping()
-    public ResultVo delete(@RequestParam Integer id) {
-        boolean remove = userService.removeById(id);
+    @DeleteMapping("/{userId}")
+    public ResultVo delete(@PathVariable("userId") Integer userId) {
+        boolean remove = userService.removeById(userId);
         if(remove) {
             return ResultUtils.success("删除用户成功");
         }else{
@@ -74,8 +75,22 @@ public class SysUserController {
             user.setPassword(DigestUtils.md5DigestAsHex(user.getPassword().getBytes()));
         }
         user.setUpdateTime(LocalDateTime.now());
+        //修改sys_user表
         boolean update = userService.updateById(user);
-        if(update) {
+        //修改sys_user_role
+        QueryWrapper<SysUserRole> queryRole = new QueryWrapper<>();
+        queryRole.lambda().eq(SysUserRole::getUserId, user.getUserId());
+        SysUserRole userRole = userRoleService.getOne(queryRole);
+        if(userRole != null) {
+            userRole.setRoleId(user.getRoleId());
+        }else{
+            userRole = new SysUserRole();
+            userRole.setUserId(user.getUserId());
+            userRole.setRoleId(user.getRoleId());
+            userRoleService.save(userRole);
+        }
+        boolean userRoleUpdate = userRoleService.updateById(userRole);
+        if(update && userRoleUpdate) {
             return ResultUtils.success("编辑用户成功");
         }else{
             return ResultUtils.error("编辑用户失败");
@@ -97,9 +112,9 @@ public class SysUserController {
 
     @ApiOperation("根据用户id查角色")
     @GetMapping("role")
-    public ResultVo getRole(@RequestParam Integer id) {
+    public ResultVo getRole(@RequestParam Integer userId) {
         QueryWrapper<SysUserRole> query = new QueryWrapper<>();
-        query.lambda().eq(SysUserRole::getUserId, id);
+        query.lambda().eq(SysUserRole::getUserId, userId);
         SysUserRole one = userRoleService.getOne(query);
         return ResultUtils.success("查询成功",one);
     }
