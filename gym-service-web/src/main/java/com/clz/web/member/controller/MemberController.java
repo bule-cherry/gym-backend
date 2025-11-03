@@ -6,15 +6,21 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.clz.utils.ResultUtils;
 import com.clz.utils.ResultVo;
+import com.clz.web.member.entity.JoinParam;
 import com.clz.web.member.entity.Member;
 import com.clz.web.member.entity.PageParam;
+import com.clz.web.member.entity.RechargeParam;
 import com.clz.web.member.service.MemberService;
 
+import com.clz.web.member_card.entity.MemberCard;
+import com.clz.web.member_card.service.MemberCardService;
 import com.clz.web.member_role.entity.MemberRole;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
+import java.text.ParseException;
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/member")
@@ -64,6 +70,27 @@ public class MemberController {
         }else{
             return ResultUtils.success("查询失败");
         }
+    }
 
+    @Resource
+    private MemberCardService memberCardService;
+    @Resource
+    private MemberService memberService;
+
+    @GetMapping("/getCardList")
+    public ResultVo getCardList() {
+        List<MemberCard> list = memberCardService.list();
+        return ResultUtils.success("查询成功",list);
+    }
+
+    @PostMapping("/joinApply")
+    public ResultVo joinApply(@RequestBody JoinParam param) throws ParseException {
+        memberService.joinApply(param);
+        return ResultUtils.success("办卡成功");
+    }
+    @PostMapping("recharge")
+    public ResultVo recharge(@RequestBody RechargeParam param) {
+        memberService.recharge(param);
+        return ResultUtils.success("充值成功");
     }
 }
