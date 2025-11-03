@@ -1,6 +1,7 @@
 package com.clz.web.member.entity;
 
 import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Data;
@@ -10,6 +11,8 @@ import lombok.Data;
 public class Member {
     @TableId(type = IdType.AUTO)
     private Long memberId;
+    @TableField(exist = false)
+    private Long roleId;
     private String name;
     private String sex;
     private String phone;

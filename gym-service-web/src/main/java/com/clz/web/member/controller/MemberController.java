@@ -9,8 +9,8 @@ import com.clz.utils.ResultVo;
 import com.clz.web.member.entity.Member;
 import com.clz.web.member.entity.PageParam;
 import com.clz.web.member.service.MemberService;
-import com.clz.web.member_card.entity.ListCard;
-import com.clz.web.member_card.entity.MemberCard;
+
+import com.clz.web.member_role.entity.MemberRole;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.web.bind.annotation.*;
 
@@ -24,15 +24,15 @@ public class MemberController {
 
     @PostMapping
     public ResultVo add(@RequestBody Member member) {
-        if(service.save(member)) {
+        if(service.add(member)) {
             return ResultUtils.success("添加成功");
         }else{
-            return ResultUtils.error("添加失败");
+            return ResultUtils.error("会员卡号被占用!");
         }
     }
     @DeleteMapping("/{memberId}")
     public ResultVo delete(@PathVariable("memberId") Long memberId) {
-        if(service.removeById(memberId)){
+        if(service.delete(memberId)){
             return ResultUtils.success("删除成功");
         }else{
             return ResultUtils.error("删除失败");
@@ -40,10 +40,10 @@ public class MemberController {
     }
     @PutMapping
     public ResultVo edit(@RequestBody Member member) {
-        if(service.updateById(member)) {
+        if(service.edit(member)) {
             return ResultUtils.success("修改成功");
         }else{
-            return ResultUtils.error("修改失败");
+            return ResultUtils.error("会员卡号被占用!");
         }
     }
     @GetMapping("/list")
@@ -55,5 +55,15 @@ public class MemberController {
                 .like(StringUtils.isNotEmpty(pageParam.getUsername()),Member::getUsername,pageParam.getUsername());
         Page<Member> list = service.page(page, query);
         return ResultUtils.success("查询成功",list);
+    }
+    @GetMapping("getRoleByMemberId")
+    public ResultVo getRoleByMemberId(Long memberId) {
+        MemberRole memberRole = service.getRoleByMemberId(memberId);
+        if(memberRole != null){
+            return ResultUtils.success("查询成功",memberRole);
+        }else{
+            return ResultUtils.success("查询失败");
+        }
+
     }
 }
