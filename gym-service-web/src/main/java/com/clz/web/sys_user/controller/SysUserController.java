@@ -1,9 +1,11 @@
 package com.clz.web.sys_user.controller;
 
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.clz.utils.ResultUtils;
 import com.clz.utils.ResultVo;
+import com.clz.web.sys_role.entity.SelectType;
 import com.clz.web.sys_user.entity.PageParam;
 import com.clz.web.sys_user.entity.SysUser;
 import com.clz.web.sys_user.service.SysUserService;
@@ -16,9 +18,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
 import java.time.LocalDateTime;
-import java.util.Date;
-import java.util.Objects;
-import java.util.Optional;
+import java.util.*;
 
 @RestController
 @RequestMapping("/api/user")
@@ -117,6 +117,20 @@ public class SysUserController {
         query.lambda().eq(SysUserRole::getUserId, userId);
         SysUserRole one = userRoleService.getOne(query);
         return ResultUtils.success("查询成功",one);
+    }
+
+    @GetMapping("getTeacher")
+    public ResultVo getTeacher(){
+        LambdaQueryWrapper<SysUser> query = new LambdaQueryWrapper<SysUser>().eq(SysUser::getUserType,2);
+        List<SysUser> list = userService.list(query);
+        List<SelectType> listType = new ArrayList<>();
+        if(!list.isEmpty()) {
+            list.forEach(item ->{
+                SelectType selectType = new SelectType(new Long(item.getUserId()),item.getNickName());
+                listType.add(selectType);
+            });
+        }
+        return ResultUtils.success("查询成功",listType);
     }
 
 }

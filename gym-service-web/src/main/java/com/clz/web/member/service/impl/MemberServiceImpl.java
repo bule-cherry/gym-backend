@@ -128,8 +128,7 @@ public class MemberServiceImpl extends ServiceImpl<MemberMapper, Member> impleme
     @Override
     @Transactional
     public void recharge(RechargeParam param) {
-        SysUser user = sysUserService.getById(param.getUserId());
-        MemberRecharge memberRecharge = new MemberRecharge(null,param.getMemberId(),param.getMoney(),new Date(),user.getNickName() );
+        MemberRecharge memberRecharge = new MemberRecharge(null,param.getMemberId(),param.getMoney(), new Date(), null);
         boolean save = memberRechargeService.save(memberRecharge);
         if(save){
             memberMapper.addMoney(param);

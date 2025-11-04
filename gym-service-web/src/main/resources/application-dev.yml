@@ -7,6 +7,11 @@ spring:
     url: jdbc:mysql://192.168.65.140:3306/gym?useUnicode=true&characterEncoding=UTF-8&serverTimezone=Asia/Shanghai&useSSL=false
     username: root
     password: Admin123!
+  servlet:
+    multipart:
+      max-file-size: 200MB # 单个文件大小, springboot 内置tomcat文件传输默认10MB
+      max-request-size: 500MB # 单次请求总文件大小
+      enabled: true #千万注意要设置该参数，否则不生效
 mybatis-plus:
   configuration:
     log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
@@ -18,3 +23,7 @@ mybatis-plus:
 logging:
   pattern:
     console: '%d{yyyy-MM-dd} [%thread] %-5level %logger- %msg%n'
+minio:
+  endpoint: http://127.0.0.1:9000
+  accesskey: minioadmin
+  secretKey: minioadmin
