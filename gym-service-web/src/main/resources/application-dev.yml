@@ -27,3 +27,11 @@ minio:
   endpoint: http://127.0.0.1:9000
   accesskey: minioadmin
   secretKey: minioadmin
+  #jwt配置
+jwt:
+  #颁发者
+  issuer: clz
+  #秘钥
+  secret: com.clz
+  #30分钟过期
+  expiration: 30
