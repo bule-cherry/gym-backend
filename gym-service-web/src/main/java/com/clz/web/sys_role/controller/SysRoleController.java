@@ -5,11 +5,15 @@ import com.clz.utils.ResultUtils;
 import com.clz.utils.ResultVo;
 import com.clz.web.sys_role.entity.*;
 import com.clz.web.sys_role.service.SysRoleService;
+import com.clz.web.sys_role_menu.entity.SaveMenuParam;
+import com.clz.web.sys_role_menu.service.RoleMenuService;
+import com.clz.web.sys_role_menu.service.impl.RoleMenuServiceImpl;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import javax.annotation.Resource;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -79,6 +83,15 @@ public class SysRoleController {
     @GetMapping("/getMenuTree")
     public ResultVo getMenuTree(RoleAssignParam param) {
         return ResultUtils.success("查询成功",service.getMenuTree(param));
+    }
+
+    @Resource
+    private RoleMenuService roleMenuService;
+
+    @PostMapping("/saveRoleMenu")
+    public ResultVo saveRoleMenu(@RequestBody SaveMenuParam param){
+        roleMenuService.saveRoleMenu(param);
+        return ResultUtils.success("分配成功");
     }
 
 

@@ -1,0 +1,13 @@
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.clz.web.sys_role_menu.mapper.RoleMenuMapper">
+
+<insert id="saveRoleMenu">
+    INSERT INTO sys_role_menu(role_id,menu_id) VALUES
+        <foreach collection="menuIds" item="item" separator=",">
+            (#{roleId},#{item})
+        </foreach>
+</insert>
+
+</mapper>
