@@ -3,9 +3,7 @@ package com.clz.web.sys_role.controller;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.clz.utils.ResultUtils;
 import com.clz.utils.ResultVo;
-import com.clz.web.sys_role.entity.RoleParam;
-import com.clz.web.sys_role.entity.SelectType;
-import com.clz.web.sys_role.entity.SysRole;
+import com.clz.web.sys_role.entity.*;
 import com.clz.web.sys_role.service.SysRoleService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -76,6 +74,11 @@ public class SysRoleController {
                     new SelectType(item.getRoleId(), item.getRoleName()));
         });
         return ResultUtils.success("查询成功",selectTypes);
+    }
+
+    @GetMapping("/getMenuTree")
+    public ResultVo getMenuTree(RoleAssignParam param) {
+        return ResultUtils.success("查询成功",service.getMenuTree(param));
     }
 
 

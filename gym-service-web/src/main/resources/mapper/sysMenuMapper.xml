@@ -1,0 +1,31 @@
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.clz.web.sys_menu.mapper.SysMenuMapper">
+
+    <select id="getMenuByUserId" parameterType="long" resultType="com.clz.web.sys_menu.entity.SysMenu">
+        SELECT m.* FROM
+            sys_user_role ur LEFT JOIN sys_role r ON ur.role_id = r.role_id
+                             LEFT JOIN sys_role_menu rm ON r.role_id = rm.role_id
+                             LEFT JOIN sys_menu m ON rm.menu_id = m.menu_id
+        WHERE ur.user_id = #{id}
+        ORDER BY m.order_num ASC
+    </select>
+
+    <select id="getMenuByMemberId" parameterType="long" resultType="com.clz.web.sys_menu.entity.SysMenu">
+        SELECT m.* FROM
+            member_role mr LEFT JOIN sys_role r ON mr.role_id = r.role_id
+                           LEFT JOIN sys_role_menu rm ON r.role_id = rm.role_id
+                           LEFT JOIN sys_menu m ON rm.menu_id = m.menu_id
+        WHERE mr.member_id = #{id}
+        ORDER BY m.order_num ASC
+    </select>
+
+    <select id="getMenuByRoleId" parameterType="long" resultType="com.clz.web.sys_menu.entity.SysMenu">
+        SELECT m.* FROM
+            sys_role_menu rm LEFT JOIN sys_menu m ON rm.menu_id = m.menu_id
+        WHERE rm.role_id = #{id}
+        ORDER BY m.order_num ASC
+    </select>
+
+</mapper>

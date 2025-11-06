@@ -1,6 +1,8 @@
 import com.clz.GYMServiceWebApplication;
 import com.clz.web.member.entity.RechargeParam;
 import com.clz.web.member.service.MemberService;
+import com.clz.web.sys_user.entity.SysUser;
+import com.clz.web.sys_user.service.SysUserService;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 
@@ -22,6 +24,14 @@ public class MemberServiceTest {
     public void test1(){
         Date date = new Date();
         System.out.println(date);
+    }
+
+    @Resource
+    SysUserService sysUserService;
+    @Test
+    public void test2(){
+        SysUser user = sysUserService.getById(1L);
+        System.out.println(user);
     }
 
 

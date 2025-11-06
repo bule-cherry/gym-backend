@@ -7,4 +7,10 @@ import java.util.List;
 
 public interface SysMenuService extends IService<SysMenu> {
     public List<SysMenu> getParent();
+
+    public List<SysMenu> getMenuByUserId(Long id);
+
+    public List<SysMenu> getMenuByMemberId(Long id);
+
+    public List<SysMenu> getMenuByRoleId(Long id);
 }
