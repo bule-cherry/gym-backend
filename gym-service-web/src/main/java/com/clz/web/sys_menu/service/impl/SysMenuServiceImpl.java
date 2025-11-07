@@ -18,9 +18,9 @@ public class SysMenuServiceImpl extends ServiceImpl<SysMenuMapper, SysMenu> impl
 
     @Override
     public List<SysMenu> getParent() {
-        List<String> strings = Arrays.asList("1","2");
+        List<String> strings = Arrays.asList("1","0");
         QueryWrapper<SysMenu> query = new QueryWrapper<>();
-        query.lambda().in(SysMenu::getParentId, strings).orderByDesc(SysMenu::getOrderNum);
+        query.lambda().in(SysMenu::getType, strings).orderByDesc(SysMenu::getOrderNum);
         List<SysMenu> menus = mapper.selectList(query);
         //组装顶级菜单（默认）
         SysMenu menu = new SysMenu();
