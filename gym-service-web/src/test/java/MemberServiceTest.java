@@ -1,6 +1,10 @@
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.clz.GYMServiceWebApplication;
 import com.clz.web.member.entity.RechargeParam;
 import com.clz.web.member.service.MemberService;
+import com.clz.web.member_recharge.entity.MemberRecharge;
+import com.clz.web.member_recharge.mapper.MemberRechargeMapper;
 import com.clz.web.sys_menu.entity.SysMenu;
 import com.clz.web.sys_menu.service.SysMenuService;
 import com.clz.web.sys_user.entity.SysUser;
@@ -43,6 +47,14 @@ public class MemberServiceTest {
     public void test3(){
         List<SysMenu> menuList = sysMenuService.getMenuByUserId(3L);
         System.out.println(menuList);
+    }
+    @Resource
+    MemberRechargeMapper memberRechargeMapper;
+    @Test
+    public void test4(){
+        Page<MemberRecharge> page = new Page<>(1, 10);
+        IPage<MemberRecharge> rechargeList = memberRechargeMapper.getRechargeList(page);
+        System.out.println(rechargeList);
     }
 
 

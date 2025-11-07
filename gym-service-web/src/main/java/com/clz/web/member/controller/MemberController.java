@@ -14,6 +14,9 @@ import com.clz.web.member.service.MemberService;
 
 import com.clz.web.member_card.entity.MemberCard;
 import com.clz.web.member_card.service.MemberCardService;
+import com.clz.web.member_recharge.entity.MemberRecharge;
+import com.clz.web.member_recharge.entity.RechargeParamList;
+import com.clz.web.member_recharge.service.MemberRechargeService;
 import com.clz.web.member_role.entity.MemberRole;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.web.bind.annotation.*;
@@ -92,5 +95,22 @@ public class MemberController {
     public ResultVo recharge(@RequestBody RechargeParam param) {
         memberService.recharge(param);
         return ResultUtils.success("充值成功");
+    }
+
+    @Resource
+    MemberRechargeService memberRechargeService;
+
+    @GetMapping("/getMyRecharge")
+    public ResultVo getMyRecharge(RechargeParamList param) {
+        String type = param.getUserType();
+        if("1".equals(type)){//会员
+            IPage<MemberRecharge> list = memberRechargeService.getRechargeByMember(param);
+            return ResultUtils.success("查询成功",list);
+        }else if("2".equals(type)){//员工
+            IPage<MemberRecharge> list = memberRechargeService.getRechargeList(param);
+            return ResultUtils.success("查询成功",list);
+        }else{
+            return ResultUtils.error("用户类型不存在!");
+        }
     }
 }

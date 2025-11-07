@@ -133,7 +133,7 @@ public class MemberServiceImpl extends ServiceImpl<MemberMapper, Member> impleme
     @Override
     @Transactional
     public void recharge(RechargeParam param) {
-        MemberRecharge memberRecharge = new MemberRecharge(null,param.getMemberId(),param.getMoney(), new Date(), null);
+        MemberRecharge memberRecharge = new MemberRecharge(param.getMemberId(),param.getMoney(), new Date());
         boolean save = memberRechargeService.save(memberRecharge);
         if(save){
             memberMapper.addMoney(param);
