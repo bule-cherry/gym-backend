@@ -1,6 +1,8 @@
 import com.clz.GYMServiceWebApplication;
 import com.clz.web.member.entity.RechargeParam;
 import com.clz.web.member.service.MemberService;
+import com.clz.web.sys_menu.entity.SysMenu;
+import com.clz.web.sys_menu.service.SysMenuService;
 import com.clz.web.sys_user.entity.SysUser;
 import com.clz.web.sys_user.service.SysUserService;
 import org.junit.jupiter.api.Test;
@@ -9,6 +11,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import javax.annotation.Resource;
 import java.math.BigDecimal;
 import java.util.Date;
+import java.util.List;
 
 @SpringBootTest(classes = GYMServiceWebApplication.class)
 public class MemberServiceTest {
@@ -32,6 +35,14 @@ public class MemberServiceTest {
     public void test2(){
         SysUser user = sysUserService.getById(1L);
         System.out.println(user);
+    }
+
+    @Resource
+    SysMenuService sysMenuService;
+    @Test
+    public void test3(){
+        List<SysMenu> menuList = sysMenuService.getMenuByUserId(3L);
+        System.out.println(menuList);
     }
 
 

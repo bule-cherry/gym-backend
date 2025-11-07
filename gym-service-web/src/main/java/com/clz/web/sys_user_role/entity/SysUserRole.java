@@ -18,11 +18,11 @@ import java.io.Serializable;
 public class SysUserRole implements Serializable {
     @ApiModelProperty(value = "主键", example = "1", required = true)
     @TableId(value = "user_role_id", type = IdType.AUTO)  // 主键字段，自增
-    private Integer userRoleId;
+    private Long userRoleId;
 
     @ApiModelProperty(value = "员工id", example = "1001")
-    private Integer userId;
+    private Long userId;
 
     @ApiModelProperty(value = "角色id", example = "2001")
-    private Integer roleId;
+    private Long roleId;
 }

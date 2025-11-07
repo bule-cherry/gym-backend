@@ -5,13 +5,20 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.clz.jwt.JwtUtils;
 import com.clz.utils.ResultUtils;
 import com.clz.utils.ResultVo;
+import com.clz.web.login.entity.InfoParam;
 import com.clz.web.login.entity.LoginParam;
 import com.clz.web.login.entity.LoginResult;
+import com.clz.web.login.entity.UserInfo;
 import com.clz.web.member.entity.Member;
 import com.clz.web.member.service.MemberService;
+import com.clz.web.sys_menu.entity.MakeMenuTree;
+import com.clz.web.sys_menu.entity.RouterVO;
+import com.clz.web.sys_menu.entity.SysMenu;
+import com.clz.web.sys_menu.service.SysMenuService;
 import com.clz.web.sys_user.entity.SysUser;
 import com.clz.web.sys_user.service.SysUserService;
 import com.google.code.kaptcha.impl.DefaultKaptcha;
+import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.DigestUtils;
 import org.springframework.web.bind.annotation.*;
@@ -24,8 +31,8 @@ import javax.servlet.http.HttpSession;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/login")
@@ -112,4 +119,75 @@ public class LoginController {
             return ResultUtils.error("用户类型错误");
         }
     }
+
+    @Resource
+    SysMenuService sysMenuService;
+
+    //查询用户信息
+    @GetMapping("/getInfo")
+    public ResultVo getInfo(InfoParam param) {
+        String type = param.getUserType();
+        Long id = param.getUserId();
+        if(type.equals("1")){//会员
+            List<SysMenu> menuList = sysMenuService.getMenuByMemberId(id);
+            List<String> codeList = Optional.ofNullable(menuList).orElse(new ArrayList<>())
+                    .stream()
+                    .map(SysMenu::getCode)
+                    .filter(Objects::nonNull)
+                    .collect(Collectors.toList());
+            Member member = memberService.getById(id);
+            UserInfo userInfo = new UserInfo(member.getMemberId(), member.getName(), codeList.toArray(new String[codeList.size()]));
+            return ResultUtils.success("查询成功",userInfo);
+        }else if(type.equals("2")){//员工
+            SysUser user = sysUserService.getById(id);
+            List<SysMenu> menuList;
+            if(StringUtils.isNotEmpty(user.getIsAdmin()) && user.getIsAdmin().equals("1")){ //超级管理员
+                menuList = sysMenuService.list();
+            }else {
+                menuList = sysMenuService.getMenuByUserId(id);
+            }
+            List<String> codeList = Optional.ofNullable(menuList).orElse(new ArrayList<>())
+                    .stream()
+                    .map(SysMenu::getCode)
+                    .filter(Objects::nonNull)
+                    .collect(Collectors.toList());
+            UserInfo userInfo = new UserInfo(user.getUserId(), user.getNickName(), codeList.toArray());
+            return ResultUtils.success("查询成功",userInfo);
+        }else{
+            return ResultUtils.error("用户类型错误");
+        }
+    }
+
+    //查询菜单信息
+    @GetMapping("/getMenuList")
+    public ResultVo getMenuList(InfoParam param) {
+        String type = param.getUserType();
+        Long id = param.getUserId();
+        if(type.equals("1")){//会员
+            List<SysMenu> menuList = sysMenuService.getMenuByMemberId(id);
+            menuList = Optional.ofNullable(menuList).orElse(new ArrayList<>())
+                    .stream()
+                    .filter(item -> item != null && !item.getType().equals("2"))
+                    .collect(Collectors.toList());
+            List<RouterVO> routerList = MakeMenuTree.makeRouter(menuList, 0L);
+            return ResultUtils.success("查询成功",routerList);
+        }else if(type.equals("2")){//员工
+            SysUser user = sysUserService.getById(id);
+            List<SysMenu> menuList;
+            if(StringUtils.isNotEmpty(user.getIsAdmin()) && user.getIsAdmin().equals("1")){
+                menuList = sysMenuService.list();
+            }else{
+                menuList = sysMenuService.getMenuByUserId(id);
+            }
+            menuList = Optional.ofNullable(menuList).orElse(new ArrayList<>())
+                    .stream()
+                    .filter(item -> item != null && !item.getType().equals("2"))
+                    .collect(Collectors.toList());
+            List<RouterVO> routerList = MakeMenuTree.makeRouter(menuList, 0L);
+            return ResultUtils.success("查询成功",routerList);
+        }else{
+            return ResultUtils.error("用户类型错误");
+        }
+    }
+
 }

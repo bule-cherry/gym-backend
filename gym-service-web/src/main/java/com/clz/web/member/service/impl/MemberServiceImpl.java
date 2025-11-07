@@ -20,6 +20,7 @@ import com.clz.web.member_role.entity.MemberRole;
 import com.clz.web.member_role.service.MemberRoleService;
 import com.clz.web.sys_user.entity.SysUser;
 import com.clz.web.sys_user.service.SysUserService;
+import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -47,6 +48,8 @@ public class MemberServiceImpl extends ServiceImpl<MemberMapper, Member> impleme
         if (one != null) {
             return false;
         }
+        //给密码进行一个md5加密
+        member.setPassword(DigestUtils.md5Hex(member.getPassword()));
         int i = baseMapper.insert(member);
         if (i > 0) {
             memberRoleService.save(new MemberRole(null,member.getMemberId(),member.getRoleId()));
@@ -72,6 +75,8 @@ public class MemberServiceImpl extends ServiceImpl<MemberMapper, Member> impleme
         if (one != null && !one.getMemberId().equals(member.getMemberId())) {
             return false;
         }
+        //给密码进行一个md5加密
+        member.setPassword(DigestUtils.md5Hex(member.getPassword()));
         baseMapper.updateById(member);
         LambdaUpdateWrapper<MemberRole> query = new LambdaUpdateWrapper<MemberRole>()
                 .eq(MemberRole::getMemberId, member.getMemberId())

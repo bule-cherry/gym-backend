@@ -21,11 +21,11 @@ public class SysUser {
 
     @ApiModelProperty(value = "员工id", example = "1", required = true)
     @TableId(type = IdType.AUTO)
-    private Integer userId;
+    private Long userId;
 
     //表明roleId字段不属于sys_user表，需要排除
     @TableField(exist = false)
-    private Integer roleId;
+    private Long roleId;
 
     @ApiModelProperty(value = "账户(员工编号)", example = "emp001")
     private String username;
