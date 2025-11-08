@@ -6,4 +6,9 @@
     <update id="addMoney" parameterType="com.clz.web.member.entity.RechargeParam">
         update member set money = money + #{param.money} where member_id = #{param.memberId}
     </update>
+
+    <update id="subMoney" parameterType="com.clz.web.member.entity.RechargeParam">
+        update member set money = money - #{param.money} where member_id = #{param.memberId}
+    </update>
+
 </mapper>

@@ -119,6 +119,7 @@ public class SysUserController {
         return ResultUtils.success("查询成功",one);
     }
 
+    //查询课程教师
     @GetMapping("getTeacher")
     public ResultVo getTeacher(){
         LambdaQueryWrapper<SysUser> query = new LambdaQueryWrapper<SysUser>().eq(SysUser::getUserType,2);
@@ -126,7 +127,7 @@ public class SysUserController {
         List<SelectType> listType = new ArrayList<>();
         if(!list.isEmpty()) {
             list.forEach(item ->{
-                SelectType selectType = new SelectType(new Long(item.getUserId()),item.getNickName());
+                SelectType selectType = new SelectType(item.getUserId(),item.getNickName());
                 listType.add(selectType);
             });
         }

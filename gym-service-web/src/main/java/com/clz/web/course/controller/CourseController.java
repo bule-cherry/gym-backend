@@ -7,6 +7,12 @@ import com.clz.utils.ResultVo;
 import com.clz.web.course.entity.Course;
 import com.clz.web.course.entity.CourseList;
 import com.clz.web.course.service.CourseService;
+import com.clz.web.member.entity.Member;
+import com.clz.web.member.service.MemberService;
+import com.clz.web.member_course.entity.MemberCourse;
+import com.clz.web.member_course.service.MemberCourseService;
+import io.swagger.annotations.ApiModelProperty;
+import io.swagger.annotations.ApiOperation;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.web.bind.annotation.*;
 
@@ -51,5 +57,31 @@ public class CourseController {
                 .like(StringUtils.isNotEmpty(param.getTeacherName()),Course::getTeacherName,param.getTeacherName());
         Page<Course> list = service.page(page, query);
         return ResultUtils.success("查询成功",list);
+    }
+
+    @Resource
+    private MemberCourseService memberCourseService;
+
+    @Resource
+    MemberService memberService;
+    @Resource
+    CourseService courseService;
+
+    //报名课程
+    @PostMapping("/joinCourse")
+    @ApiOperation("报名课程")
+    public ResultVo joinCourse(@RequestBody MemberCourse memberCourse) {
+        LambdaQueryWrapper<MemberCourse> query = new LambdaQueryWrapper<MemberCourse>().eq(MemberCourse::getCourseId, memberCourse.getCourseId()).eq(MemberCourse::getMemberId, memberCourse.getMemberId());
+        MemberCourse one = memberCourseService.getOne(query);
+        if(one != null){
+            return ResultUtils.error("该用户已经报名过此课程");
+        }
+        Course course = courseService.getById(memberCourse.getCourseId());
+        Member member = memberService.getById(memberCourse.getMemberId());
+        if(member.getMoney().compareTo(course.getCoursePrice()) == -1){
+            return ResultUtils.error("您的余额不足，请充值!");
+        }
+        memberCourseService.joinCourse(memberCourse);
+        return ResultUtils.success("报名成功");
     }
 }
