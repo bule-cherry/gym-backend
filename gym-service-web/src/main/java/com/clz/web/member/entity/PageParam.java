@@ -10,4 +10,7 @@ public class PageParam {
     private String phone;
     private String username;
 
+    private String userType;
+    private Long memberId;
+
 }

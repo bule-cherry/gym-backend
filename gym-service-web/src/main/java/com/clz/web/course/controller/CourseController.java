@@ -6,6 +6,7 @@ import com.clz.utils.ResultUtils;
 import com.clz.utils.ResultVo;
 import com.clz.web.course.entity.Course;
 import com.clz.web.course.entity.CourseList;
+import com.clz.web.course.entity.PageParam;
 import com.clz.web.course.service.CourseService;
 import com.clz.web.member.entity.Member;
 import com.clz.web.member.service.MemberService;
@@ -83,5 +84,21 @@ public class CourseController {
         }
         memberCourseService.joinCourse(memberCourse);
         return ResultUtils.success("报名成功");
+    }
+
+    //我的课程列表
+    @GetMapping("/getMyCourseList")
+    public ResultVo getMyCourseList(PageParam param){
+        if("1".equals(param.getUserType())){//会员
+            Page<MemberCourse> page = new Page<>(param.getCurrentPage(), param.getPageSize());
+            LambdaQueryWrapper<MemberCourse> query = new LambdaQueryWrapper<MemberCourse>().eq(MemberCourse::getMemberId, param.getUserId());
+            Page<MemberCourse> list = memberCourseService.page(page, query);
+            return ResultUtils.success("查询成功", list);
+        }else{//员工
+            Page<Course> page = new Page<>(param.getCurrentPage(), param.getPageSize());
+            LambdaQueryWrapper<Course> query = new LambdaQueryWrapper<Course>().eq(Course::getTeacherId, param.getUserId());
+            Page<Course> list = courseService.page(page, query);
+            return ResultUtils.success("查询成功", list);
+        }
     }
 }

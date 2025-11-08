@@ -57,13 +57,24 @@ public class MemberController {
     }
     @GetMapping("/list")
     public ResultVo list(PageParam pageParam) {
-        Page<Member> page = new Page<>(pageParam.getCurrentPage(), pageParam.getPageSize());
-        LambdaQueryWrapper<Member> query = new LambdaQueryWrapper<Member>()
-                .like(StringUtils.isNotEmpty(pageParam.getName()),Member::getName,pageParam.getName())
-                .like(StringUtils.isNotEmpty(pageParam.getPhone()),Member::getPhone,pageParam.getPhone())
-                .like(StringUtils.isNotEmpty(pageParam.getUsername()),Member::getUsername,pageParam.getUsername());
-        Page<Member> list = service.page(page, query);
-        return ResultUtils.success("查询成功",list);
+        if(pageParam.getUserType().equals("1")) {// 会员
+            Page<Member> page = new Page<>(pageParam.getCurrentPage(), pageParam.getPageSize());
+            LambdaQueryWrapper<Member> query = new LambdaQueryWrapper<Member>()
+                    .like(StringUtils.isNotEmpty(pageParam.getName()),Member::getName,pageParam.getName())
+                    .like(StringUtils.isNotEmpty(pageParam.getPhone()),Member::getPhone,pageParam.getPhone())
+                    .like(StringUtils.isNotEmpty(pageParam.getUsername()),Member::getUsername,pageParam.getUsername())
+                    .eq(Member::getMemberId,pageParam.getMemberId());
+            Page<Member> list = service.page(page, query);
+            return ResultUtils.success("查询成功",list);
+        }else{ // 员工
+            Page<Member> page = new Page<>(pageParam.getCurrentPage(), pageParam.getPageSize());
+            LambdaQueryWrapper<Member> query = new LambdaQueryWrapper<Member>()
+                    .like(StringUtils.isNotEmpty(pageParam.getName()),Member::getName,pageParam.getName())
+                    .like(StringUtils.isNotEmpty(pageParam.getPhone()),Member::getPhone,pageParam.getPhone())
+                    .like(StringUtils.isNotEmpty(pageParam.getUsername()),Member::getUsername,pageParam.getUsername());
+            Page<Member> list = service.page(page, query);
+            return ResultUtils.success("查询成功",list);
+        }
     }
     @GetMapping("getRoleByMemberId")
     public ResultVo getRoleByMemberId(Long memberId) {
