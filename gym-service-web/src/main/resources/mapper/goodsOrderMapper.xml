@@ -1,0 +1,28 @@
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.clz.web.goods_order.mapper.GoodsOrderMapper">
+
+    <select id="hotGoods" resultType="com.clz.web.home.entity.EchartItem">
+        SELECT g.name `name`, SUM(go.num) `value`
+        FROM goods g JOIN goods_order go ON g.goods_id = go.goods_id
+        GROUP BY `name`
+        ORDER BY `value` DESC
+            LIMIT 7;
+    </select>
+    <select id="hotCards" resultType="com.clz.web.home.entity.EchartItem">
+        SELECT ma.card_type `name`, count(ma.apply_id) `value`
+        FROM member_apply ma
+        GROUP BY `name`
+        ORDER BY `value` DESC
+            LIMIT 7;
+    </select>
+    <select id="hotCourse" resultType="com.clz.web.home.entity.EchartItem">
+        SELECT c.course_name `name`, count(mc.member_course_id) `value`
+        FROM course c LEFT JOIN member_course mc ON c.course_id = mc.course_id
+        GROUP BY c.course_id
+        ORDER BY `value` DESC
+            LIMIT 7;
+    </select>
+
+</mapper>
