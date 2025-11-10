@@ -17,6 +17,12 @@ import javax.annotation.Resource;
 @EnableWebSecurity
 @EnableGlobalMethodSecurity(prePostEnabled = true)
 public class SpringSecurityConfig extends WebSecurityConfigurerAdapter {
+
+    @Resource
+    CustomerAccessDeniedHandler customAccessDeniedHandler;
+    @Resource
+    LoginFailureHandler loginFailureHandler;
+
     @Override
     protected void configure(HttpSecurity http) throws Exception {
         //解决跨域问题
@@ -26,7 +32,10 @@ public class SpringSecurityConfig extends WebSecurityConfigurerAdapter {
                 //放行登录、验证码请求,其他的所有请求都要认证
                 .antMatchers("/api/login/image","/api/login/login").permitAll()
                 //其他的任何接口访问都需要认证
-                .anyRequest().authenticated();
+                .anyRequest().authenticated()
+                .and().exceptionHandling()
+                .authenticationEntryPoint(loginFailureHandler)
+                .accessDeniedHandler(customAccessDeniedHandler);
     }
 
     //添加密码加密bean
