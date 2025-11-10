@@ -13,6 +13,7 @@ import com.clz.web.sys_user_role.entity.SysUserRole;
 import com.clz.web.sys_user_role.service.SysUserRoleService;
 import io.swagger.annotations.ApiOperation;
 import org.apache.commons.lang.StringUtils;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.util.DigestUtils;
 import org.springframework.web.bind.annotation.*;
 
@@ -25,6 +26,8 @@ import java.util.*;
 public class SysUserController {
     @Resource
     private SysUserService userService;
+    @Resource
+    PasswordEncoder passwordEncoder;
 
     @PostMapping()
     public ResultVo save(@RequestBody SysUser user) {
@@ -38,7 +41,7 @@ public class SysUserController {
         }
         //密码加密,补充IsAdmin=0,CreateTime
         if(StringUtils.isNotEmpty(user.getPassword())) {
-            user.setPassword(DigestUtils.md5DigestAsHex(user.getPassword().getBytes()));
+            user.setPassword(passwordEncoder.encode(user.getPassword()));
         }
         user.setIsAdmin("0");
         user.setCreateTime(LocalDateTime.now());
@@ -72,7 +75,7 @@ public class SysUserController {
             return ResultUtils.error("用户不存在或者用户名和id不一致");
         }
         if(StringUtils.isNotEmpty(user.getPassword())) {
-            user.setPassword(DigestUtils.md5DigestAsHex(user.getPassword().getBytes()));
+            user.setPassword(passwordEncoder.encode(user.getPassword()));
         }
         user.setUpdateTime(LocalDateTime.now());
         //修改sys_user表

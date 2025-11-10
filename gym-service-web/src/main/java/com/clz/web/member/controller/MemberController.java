@@ -19,6 +19,7 @@ import com.clz.web.member_recharge.entity.RechargeParamList;
 import com.clz.web.member_recharge.service.MemberRechargeService;
 import com.clz.web.member_role.entity.MemberRole;
 import org.apache.commons.lang.StringUtils;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;

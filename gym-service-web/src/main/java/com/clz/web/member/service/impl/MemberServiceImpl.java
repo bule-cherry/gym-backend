@@ -23,6 +23,7 @@ import com.clz.web.sys_user.service.SysUserService;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -38,6 +39,8 @@ public class MemberServiceImpl extends ServiceImpl<MemberMapper, Member> impleme
     private MemberRoleService memberRoleService;
     @Resource
     private MemberMapper memberMapper;
+    @Resource
+    PasswordEncoder passwordEncoder;
 
     @Override
     @Transactional
@@ -48,8 +51,8 @@ public class MemberServiceImpl extends ServiceImpl<MemberMapper, Member> impleme
         if (one != null) {
             return false;
         }
-        //给密码进行一个md5加密
-        member.setPassword(DigestUtils.md5Hex(member.getPassword()));
+        //给密码进行加密
+        member.setPassword(passwordEncoder.encode(member.getPassword()));
         int i = baseMapper.insert(member);
         if (i > 0) {
             memberRoleService.save(new MemberRole(null,member.getMemberId(),member.getRoleId()));
@@ -75,8 +78,8 @@ public class MemberServiceImpl extends ServiceImpl<MemberMapper, Member> impleme
         if (one != null && !one.getMemberId().equals(member.getMemberId())) {
             return false;
         }
-        //给密码进行一个md5加密
-        member.setPassword(DigestUtils.md5Hex(member.getPassword()));
+        //给密码进行加密
+        member.setPassword(passwordEncoder.encode(member.getPassword()));
         baseMapper.updateById(member);
         LambdaUpdateWrapper<MemberRole> query = new LambdaUpdateWrapper<MemberRole>()
                 .eq(MemberRole::getMemberId, member.getMemberId())
