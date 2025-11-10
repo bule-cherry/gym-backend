@@ -28,6 +28,9 @@ minio:
   accesskey: minioadmin
   secretKey: minioadmin
   #jwt配置
+#不需要token验证的请求
+ignore:
+  url: /api/login/login,/api/login/image
 jwt:
   #颁发者
   issuer: clz

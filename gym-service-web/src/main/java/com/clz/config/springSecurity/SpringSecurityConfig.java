@@ -10,6 +10,7 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 import javax.annotation.Resource;
 
@@ -22,6 +23,8 @@ public class SpringSecurityConfig extends WebSecurityConfigurerAdapter {
     CustomerAccessDeniedHandler customAccessDeniedHandler;
     @Resource
     LoginFailureHandler loginFailureHandler;
+    @Resource
+    CheckTokenFilter checkTokenFilter;
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
@@ -36,6 +39,8 @@ public class SpringSecurityConfig extends WebSecurityConfigurerAdapter {
                 .and().exceptionHandling()
                 .authenticationEntryPoint(loginFailureHandler)
                 .accessDeniedHandler(customAccessDeniedHandler);
+        // 添加token验证过滤器
+        http.addFilterBefore(checkTokenFilter, UsernamePasswordAuthenticationFilter.class);
     }
 
     //添加密码加密bean
