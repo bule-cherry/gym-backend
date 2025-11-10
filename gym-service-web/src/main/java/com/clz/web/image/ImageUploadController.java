@@ -1,7 +1,7 @@
 package com.clz.web.image;
 
 import com.alibaba.fastjson.JSONObject;
-import com.clz.config.MinioUtils;
+import com.clz.config.minio.MinioUtils;
 import com.clz.utils.ResultUtils;
 import com.clz.utils.ResultVo;
 import lombok.extern.slf4j.Slf4j;

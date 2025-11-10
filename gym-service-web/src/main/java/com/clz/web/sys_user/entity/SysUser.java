@@ -7,9 +7,12 @@ import com.baomidou.mybatisplus.annotation.TableName;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.Collection;
 
 /**
  * 系统用户实体类
@@ -17,7 +20,7 @@ import java.time.LocalDateTime;
 @ApiModel(value = "SysUser", description = "系统用户信息")
 @Data
 @TableName("sys_user")
-public class SysUser {
+public class SysUser implements UserDetails {
 
     @ApiModelProperty(value = "员工id", example = "1", required = true)
     @TableId(type = IdType.AUTO)
@@ -55,16 +58,16 @@ public class SysUser {
     private String isAdmin;
 
     @ApiModelProperty(value = "账户是否过期(1:未过期 0:已过期)", example = "1")
-    private Integer isAccountNonExpired;
+    private boolean isAccountNonExpired;
 
     @ApiModelProperty(value = "账户是否被锁定(1:未锁定 0：已锁定)", example = "1")
-    private Integer isAccountNonLocked;
+    private boolean isAccountNonLocked;
 
     @ApiModelProperty(value = "密码是否过期(1:未过期 0:已过期)", example = "1")
-    private Integer isCredentialsNonExpired;
+    private boolean isCredentialsNonExpired;
 
     @ApiModelProperty(value = "账户是否可用(1 可用 0不可用)", example = "1")
-    private Integer isEnabled;
+    private boolean isEnabled;
 
     @ApiModelProperty(value = "姓名", example = "张三")
     private String nickName;
@@ -74,4 +77,8 @@ public class SysUser {
 
     @ApiModelProperty(value = "更新时间")
     private LocalDateTime updateTime;
+    //用户权限字段的集合
+    //表明authorities字段不属于sys_user表，需要排除
+    @TableField(exist = false)
+    Collection<? extends GrantedAuthority> authorities;
 }

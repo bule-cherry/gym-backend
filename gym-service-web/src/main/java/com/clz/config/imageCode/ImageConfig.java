@@ -1,4 +1,4 @@
-package com.clz.config;
+package com.clz.config.imageCode;
 
 import com.google.code.kaptcha.Constants;
 import com.google.code.kaptcha.impl.DefaultKaptcha;

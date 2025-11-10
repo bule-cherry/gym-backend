@@ -1,4 +1,4 @@
-package com.clz.config;
+package com.clz.config.minio;
 
 import com.alibaba.fastjson.JSONObject;
 import io.minio.BucketExistsArgs;

@@ -1,5 +1,6 @@
 package com.clz.web.sys_user.service.impl;
 
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
@@ -35,5 +36,11 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
             query.lambda().like(SysUser::getPhone,param.getPhone());
         }
         return mapper.selectPage(page, query);
+    }
+
+    @Override
+    public SysUser loadUser(String username) {
+        LambdaQueryWrapper<SysUser> query = new LambdaQueryWrapper<SysUser>().eq(SysUser::getUsername, username);
+        return mapper.selectOne(query);
     }
 }

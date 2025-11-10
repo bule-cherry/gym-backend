@@ -1,4 +1,4 @@
-package com.clz.config;
+package com.clz.config.minio;
 
 import lombok.Data;
 import org.springframework.boot.context.properties.ConfigurationProperties;

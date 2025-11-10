@@ -1,4 +1,4 @@
-package com.clz.config;
+package com.clz.config.minio;
 
 import io.minio.MinioClient;
 import org.springframework.beans.factory.annotation.Autowired;

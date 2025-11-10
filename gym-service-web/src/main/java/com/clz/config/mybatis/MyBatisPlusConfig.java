@@ -1,4 +1,4 @@
-package com.clz.config;
+package com.clz.config.mybatis;
 
 import com.baomidou.mybatisplus.annotation.DbType;
 import com.baomidou.mybatisplus.extension.plugins.MybatisPlusInterceptor;

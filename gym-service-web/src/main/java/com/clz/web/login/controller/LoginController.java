@@ -20,6 +20,11 @@ import com.clz.web.sys_user.service.SysUserService;
 import com.google.code.kaptcha.impl.DefaultKaptcha;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.util.DigestUtils;
 import org.springframework.web.bind.annotation.*;
 import sun.misc.BASE64Encoder;
@@ -74,7 +79,72 @@ public class LoginController {
     @Autowired
     JwtUtils jwtUtils;
 
-    //登录
+    @Resource
+    PasswordEncoder passwordEncoder;
+    @Resource
+    AuthenticationManager authenticationManager;
+
+    @PostMapping("/login")
+    public ResultVo login(HttpServletRequest request, @RequestBody LoginParam param) {
+        if (StringUtils.isEmpty(param.getUsername()) ||
+                StringUtils.isEmpty(param.getPassword()) ||
+                StringUtils.isEmpty(param.getUserType()) ||
+                StringUtils.isEmpty(param.getCode())) {
+            return ResultUtils.error("用户名、密码、验证码或用户类型不能为空!");
+        }
+        //从session中获取 验证码
+        String code = (String) request.getSession().getAttribute("code");
+        if(StringUtils.isEmpty(code)){
+            return ResultUtils.error("验证码过期!");
+        }
+        //验证验证码
+        if (!code.equals(param.getCode())) {
+            return ResultUtils.error("验证码错误");
+        }
+        String password = passwordEncoder.encode(param.getPassword());
+        //构造spring security需要的token
+        UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken = new
+                UsernamePasswordAuthenticationToken(param.getUsername() + ":" + param.getUserType(), param.getPassword());
+        Authentication authenticate = authenticationManager.authenticate(usernamePasswordAuthenticationToken);
+        //存入Security上下文
+        SecurityContextHolder.getContext().setAuthentication(authenticate);
+
+        String type = param.getUserType();
+        if (type.equals("1")) { // 会员
+            Member user = (Member) authenticate.getPrincipal();
+            Map<String, String> map = new HashMap<>();
+            map.put("userId", Long.toString(user.getMemberId()));
+            map.put("username", user.getUsername());
+            map.put("userType", type);
+            String token = jwtUtils.generateToken(map);
+            LoginResult result = new LoginResult();
+            result.setUserId(user.getMemberId());
+            result.setUsername(user.getUsername());
+            result.setUserType(type);
+            result.setToken(token);
+            return ResultUtils.success("登录成功", result);
+        } else if (type.equals("2")) { // 用户
+            SysUser user = (SysUser) authenticate.getPrincipal();
+            Map<String, String> map = new HashMap<>();
+            map.put("userId", Long.toString(user.getUserId()));
+            map.put("username", user.getUsername());
+            map.put("userType", type);
+            String token = jwtUtils.generateToken(map);
+            LoginResult result = new LoginResult();
+            result.setUserId(user.getUserId());
+            result.setUsername(user.getUsername());
+            result.setUserType(type);
+            result.setToken(token);
+            return ResultUtils.success("登录成功", result);
+        } else {
+            return ResultUtils.error("用户类型错误");
+        }
+
+    }
+
+
+
+    /*//登录
     @PostMapping("/login")
     public ResultVo login(HttpServletRequest request, @RequestBody LoginParam param) {
         //从session中获取 验证码
@@ -118,7 +188,7 @@ public class LoginController {
         } else {
             return ResultUtils.error("用户类型错误");
         }
-    }
+    }*/
 
     @Resource
     SysMenuService sysMenuService;
@@ -128,7 +198,7 @@ public class LoginController {
     public ResultVo getInfo(InfoParam param) {
         String type = param.getUserType();
         Long id = param.getUserId();
-        if(type.equals("1")){//会员
+        if (type.equals("1")) {//会员
             List<SysMenu> menuList = sysMenuService.getMenuByMemberId(id);
             List<String> codeList = Optional.ofNullable(menuList).orElse(new ArrayList<>())
                     .stream()
@@ -137,13 +207,13 @@ public class LoginController {
                     .collect(Collectors.toList());
             Member member = memberService.getById(id);
             UserInfo userInfo = new UserInfo(member.getMemberId(), member.getName(), codeList.toArray(new String[codeList.size()]));
-            return ResultUtils.success("查询成功",userInfo);
-        }else if(type.equals("2")){//员工
+            return ResultUtils.success("查询成功", userInfo);
+        } else if (type.equals("2")) {//员工
             SysUser user = sysUserService.getById(id);
             List<SysMenu> menuList;
-            if(StringUtils.isNotEmpty(user.getIsAdmin()) && user.getIsAdmin().equals("1")){ //超级管理员
+            if (StringUtils.isNotEmpty(user.getIsAdmin()) && user.getIsAdmin().equals("1")) { //超级管理员
                 menuList = sysMenuService.list();
-            }else {
+            } else {
                 menuList = sysMenuService.getMenuByUserId(id);
             }
             List<String> codeList = Optional.ofNullable(menuList).orElse(new ArrayList<>())
@@ -152,8 +222,8 @@ public class LoginController {
                     .filter(Objects::nonNull)
                     .collect(Collectors.toList());
             UserInfo userInfo = new UserInfo(user.getUserId(), user.getNickName(), codeList.toArray());
-            return ResultUtils.success("查询成功",userInfo);
-        }else{
+            return ResultUtils.success("查询成功", userInfo);
+        } else {
             return ResultUtils.error("用户类型错误");
         }
     }
@@ -163,20 +233,20 @@ public class LoginController {
     public ResultVo getMenuList(InfoParam param) {
         String type = param.getUserType();
         Long id = param.getUserId();
-        if(type.equals("1")){//会员
+        if (type.equals("1")) {//会员
             List<SysMenu> menuList = sysMenuService.getMenuByMemberId(id);
             menuList = Optional.ofNullable(menuList).orElse(new ArrayList<>())
                     .stream()
                     .filter(item -> item != null && !item.getType().equals("2"))
                     .collect(Collectors.toList());
             List<RouterVO> routerList = MakeMenuTree.makeRouter(menuList, 0L);
-            return ResultUtils.success("查询成功",routerList);
-        }else if(type.equals("2")){//员工
+            return ResultUtils.success("查询成功", routerList);
+        } else if (type.equals("2")) {//员工
             SysUser user = sysUserService.getById(id);
             List<SysMenu> menuList;
-            if(StringUtils.isNotEmpty(user.getIsAdmin()) && user.getIsAdmin().equals("1")){
+            if (StringUtils.isNotEmpty(user.getIsAdmin()) && user.getIsAdmin().equals("1")) {
                 menuList = sysMenuService.list();
-            }else{
+            } else {
                 menuList = sysMenuService.getMenuByUserId(id);
             }
             menuList = Optional.ofNullable(menuList).orElse(new ArrayList<>())
@@ -184,10 +254,11 @@ public class LoginController {
                     .filter(item -> item != null && !item.getType().equals("2"))
                     .collect(Collectors.toList());
             List<RouterVO> routerList = MakeMenuTree.makeRouter(menuList, 0L);
-            return ResultUtils.success("查询成功",routerList);
-        }else{
+            return ResultUtils.success("查询成功", routerList);
+        } else {
             return ResultUtils.error("用户类型错误");
         }
     }
+
 
 }

@@ -140,4 +140,10 @@ public class MemberServiceImpl extends ServiceImpl<MemberMapper, Member> impleme
         }
 
     }
+
+    @Override
+    public Member loadUser(String username) {
+        LambdaQueryWrapper<Member> query = new LambdaQueryWrapper<Member>().eq(Member::getUsername, username);
+        return memberMapper.selectOne(query);
+    }
 }
