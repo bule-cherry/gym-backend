@@ -12,6 +12,9 @@ spring:
       max-file-size: 200MB # 单个文件大小, springboot 内置tomcat文件传输默认10MB
       max-request-size: 500MB # 单次请求总文件大小
       enabled: true #千万注意要设置该参数，否则不生效
+  redis:
+    port: 6379
+    host: 192.168.65.140
 mybatis-plus:
   configuration:
     log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
@@ -30,7 +33,15 @@ minio:
   #jwt配置
 #不需要token验证的请求
 ignore:
-  url: /api/login/login,/api/login/image
+  url: >
+    /api/login/login,
+    /api/login/image,
+    /swagger-ui.html,
+    /swagger-ui/**,
+    /swagger-resources/**,
+    /webjars/**,
+    /v2/api-docs,
+    /.well-known/**,
 jwt:
   #颁发者
   issuer: clz

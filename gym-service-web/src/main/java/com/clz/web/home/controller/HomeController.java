@@ -1,5 +1,7 @@
 package com.clz.web.home.controller;
 
+
+import com.alibaba.fastjson.JSON;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.clz.utils.ResultUtils;
@@ -16,16 +18,18 @@ import com.clz.web.suggest.entity.Suggest;
 import com.clz.web.suggest.service.SuggestService;
 import com.clz.web.sys_user.entity.SysUser;
 import com.clz.web.sys_user.service.SysUserService;
+import org.apache.commons.lang3.StringUtils;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.authentication.logout.SecurityContextLogoutHandler;
-import org.springframework.util.DigestUtils;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.time.Duration;
 import java.util.List;
 
 @RestController
@@ -65,9 +69,21 @@ public class HomeController {
     }
     @Resource
     GoodsOrderService goodsOrderService;
+    @Resource
+    StringRedisTemplate stringRedisTemplate;
     //热销商品
     @GetMapping("/getHotGoods")
     public ResultVo getHotGoods() {
+        //1. 从redis中查询数据
+        String hotGoods = stringRedisTemplate.opsForValue().get("hotGoods");
+        //2. 判断是否存在
+        if (StringUtils.isNotEmpty(hotGoods)) {
+            // 使用 parseObject 明确指定目标类型
+            Echart echart = JSON.parseObject(hotGoods, Echart.class);
+            // 3.存在直接返回
+            return ResultUtils.success("查询成功", echart);
+        }
+        //4. 不存在查询
         List<EchartItem> echartItems = goodsOrderService.hotGoods();
         Echart echart = new Echart();
         for (int i = 0; i < echartItems.size(); i++) {
@@ -75,7 +91,23 @@ public class HomeController {
             echart.getNames().add(item.getName());
             echart.getValues().add(item.getValue());
         }
+        String jsonString = JSON.toJSONString(echart);
+        //5.不存在返回错误
+        if (StringUtils.isEmpty(jsonString)) {
+            return  ResultUtils.error("数据不存在");
+        }
+        //6. 存在写入redis
+        stringRedisTemplate.opsForValue().set("hotGoods", jsonString, Duration.ofMinutes(30));
+        //7. 返回
         return ResultUtils.success("查询成功",echart);
+        /*List<EchartItem> echartItems = goodsOrderService.hotGoods();
+        Echart echart = new Echart();
+        for (int i = 0; i < echartItems.size(); i++) {
+            EchartItem item = echartItems.get(i);
+            echart.getNames().add(item.getName());
+            echart.getValues().add(item.getValue());
+        }
+        return ResultUtils.success("查询成功",echart);*/
     }
 
     //热销卡

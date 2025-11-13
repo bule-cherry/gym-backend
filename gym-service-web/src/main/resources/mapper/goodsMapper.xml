@@ -1,0 +1,28 @@
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.clz.web.goods.mapper.GoodsMapper">
+
+    <select id="selectGoodsPage" parameterType="map" resultType="com.clz.web.goods.entity.Goods">
+        SELECT goods_id, name, price, store, image, unit, specs
+        FROM goods
+        WHERE 1=1
+        <if test="name != null and name != ''">
+            AND name LIKE CONCAT('%', #{name}, '%')
+        </if>
+        <if test="lastId != null">
+            AND goods_id &gt; #{lastId}
+        </if>
+        ORDER BY goods_id
+        LIMIT #{pageSize}
+    </select>
+
+    <select id="countGoods" parameterType="map" resultType="long">
+        SELECT COUNT(*) FROM goods
+        WHERE 1=1
+        <if test="name != null and name != ''">
+            AND name LIKE CONCAT('%', #{name}, '%')
+        </if>
+    </select>
+
+</mapper>

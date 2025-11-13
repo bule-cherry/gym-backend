@@ -23,30 +23,40 @@ import java.io.IOException;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import org.springframework.util.AntPathMatcher;
+
 
 @Component
 public class CheckTokenFilter extends OncePerRequestFilter {
-    //拿到配置文件中ignore.url的值, 按逗号分割
     @Value("#{'${ignore.url}'.split(',')}")
-    private List<String> ignoreUrls = Collections.emptyList();
+    private List<String> ignoreUrls;
+
+    private final AntPathMatcher pathMatcher = new AntPathMatcher();
+
     @Resource
     private JwtUtils jwtUtils;
     @Resource
-    CustomUserDetailsService customUserDetailsService;
+    private CustomUserDetailsService customUserDetailsService;
     @Resource
-    LoginFailureHandler loginFailureHandler;
+    private LoginFailureHandler loginFailureHandler;
 
     @Override
-    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
+    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response,
+                                    FilterChain filterChain) throws ServletException, IOException {
         String url = request.getRequestURI();
+
         try {
-            if(!ignoreUrls.contains(url) && !url.startsWith("/images/")){
+            boolean shouldIgnore = ignoreUrls.stream()
+                    .anyMatch(ignore -> pathMatcher.match(ignore.trim(), url));
+
+            if (!shouldIgnore && !url.startsWith("/images/")) {
                 validateToken(request);
             }
         } catch (AuthenticationException e) {
             loginFailureHandler.commence(request, response, e);
             return;
         }
+
         filterChain.doFilter(request, response);
     }
 

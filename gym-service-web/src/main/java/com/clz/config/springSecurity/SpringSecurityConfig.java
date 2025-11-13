@@ -33,7 +33,10 @@ public class SpringSecurityConfig extends WebSecurityConfigurerAdapter {
         //关闭跨域请求伪造
         http.csrf().disable().authorizeRequests()
                 //放行登录、验证码请求,其他的所有请求都要认证
-                .antMatchers("/api/login/image","/api/login/login").permitAll()
+                .antMatchers("/api/login/image","/api/login/login","/swagger-ui.html",
+                        "/swagger-resources/**",
+                        "/v2/api-docs",
+                        "/webjars/**").permitAll()
                 //其他的任何接口访问都需要认证
                 .anyRequest().authenticated()
                 .and().exceptionHandling()
